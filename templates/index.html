@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CubeSec — Cube Entropy-Based Secure Authentication Prototype</title>
+  <meta name="description" content="Local prototype demonstrating physical-world entropy acquisition from Rubik's cube vision and scramble audio for secure authentication.">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar" id="appSidebar" aria-label="Main Navigation">
+      <div class="sidebar-header">
+        <div class="brand-badge">
+          <div class="brand-cube-icon" aria-hidden="true">
+            <div class="cube-cell"></div>
+            <div class="cube-cell"></div>
+            <div class="cube-cell"></div>
+            <div class="cube-cell"></div>
+          </div>
+          <span>CubeSec</span>
+        </div>
+        <span class="version-tag">Prototype v1.0</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Core Demonstration</div>
+        
+        <button class="nav-item active" data-view="overview" id="nav-overview">
+          <div class="nav-item-content">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>Overview</span>
+          </div>
+        </button>
+
+        <button class="nav-item" data-view="cube-vision" id="nav-cube-vision">
+          <div class="nav-item-content">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            <span>Cube Vision</span>
+          </div>
+          <span class="nav-badge" id="badge-cube-faces">0/6</span>
+        </button>
+
+        <button class="nav-item" data-view="entropy-engine" id="nav-entropy-engine">
+          <div class="nav-item-content">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            <span>Entropy Engine</span>
+          </div>
+          <span class="nav-badge" id="badge-audio-status">Idle</span>
+        </button>
+
+        <button class="nav-item" data-view="authentication" id="nav-authentication">
+          <div class="nav-item-content">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Authentication</span>
+          </div>
+          <span class="nav-badge" id="badge-auth-status">Inactive</span>
+        </button>
+
+        <div class="nav-section-title">Developer & Audit</div>
+
+        <button class="nav-item" data-view="api-playground" id="nav-api-playground">
+          <div class="nav-item-content">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+            <span>API Playground</span>
+          </div>
+        </button>
+
+        <button class="nav-item" data-view="security-logs" id="nav-security-logs">
+          <div class="nav-item-content">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span>Security Logs</span>
+          </div>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="session-mini-status">
+          <div class="mini-status-row">
+            <span>Cube Vision:</span>
+            <span id="mini-status-faces"><span class="indicator-dot dot-idle"></span> 0 of 6</span>
+          </div>
+          <div class="mini-status-row">
+            <span>Audio Telemetry:</span>
+            <span id="mini-status-audio"><span class="indicator-dot dot-idle"></span> Pending</span>
+          </div>
+          <div class="mini-status-row">
+            <span>Demo Token:</span>
+            <span id="mini-status-token"><span class="indicator-dot dot-idle"></span> None</span>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; font-size:11px; padding:0 4px;">
+          <a href="#" id="link-privacy-policy" style="color:var(--text-muted);">Privacy Practices</a>
+          <span style="color:var(--border-medium);">•</span>
+          <a href="#" id="link-terms-service" style="color:var(--text-muted);">Demo Terms</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <!-- Top App Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle navigation menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="breadcrumb-area">
+            <span class="breadcrumb-base">CubeSec</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current" id="headerBreadcrumb">Overview</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button class="btn btn-subtle" id="btnQuickResetSession" title="Reset all demonstration states">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+            <span class="btn-text-hide">Reset Session</span>
+          </button>
+
+          <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
+            <svg id="themeIconSun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg id="themeIconMoon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <span id="themeToggleLabel">Theme</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Views -->
+      <div class="content-body">
+        
+        <!-- ================= VIEW 1: OVERVIEW ================= -->
+        <section class="module-view active" id="view-overview">
+          <div class="view-header">
+            <div class="view-pretitle">Concept Demonstration</div>
+            <h1 class="view-title">CubeSec Authentication System</h1>
+            <p class="view-description">
+              An exploratory security prototype investigating physical-world entropy acquisition. CubeSec connects computer vision cube face recognition, scramble audio acoustic feature extraction, canonical pre-image hashing, and secure token issuance.
+            </p>
+          </div>
+
+          <div class="alert alert-info">
+            <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <div>
+              <strong>Prototype Positioning:</strong> This local demonstration showcases a proposed physical-world authentication concept. Physical arrangements and audio features provide demonstrative seeding, not NIST-certified cryptographic randomness.
+            </div>
+          </div>
+
+          <!-- Quick Action Bar -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                Demonstration Controls
+              </span>
+              <div class="card-actions">
+                <button class="btn btn-secondary" id="btnOverviewLoadSample">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  Quick-Load Sample Data
+                </button>
+                <button class="btn btn-primary" id="btnStartGuidedDemo">
+                  Start Guided Demonstration &rarr;
+                </button>
+              </div>
+            </div>
+            <p style="font-size:13px; color:var(--text-secondary);">
+              To experience the entire authentication pipeline with one click, select <em>Quick-Load Sample Data</em>. Alternatively, click <em>Start Guided Demonstration</em> to upload your own cube face photographs and record live scramble sounds.
+            </p>
+          </div>
+
+          <!-- Pipeline Architecture Diagram -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Three-Stage Physical Entropy Architecture</span>
+            </div>
+            <div class="pipeline-flow">
+              <div class="pipeline-step step-active" id="overview-step-cv">
+                <div class="step-num">Module A</div>
+                <div class="step-title">Cube Vision</div>
+                <div class="step-desc">OpenCV samples 6 faces (54 color stickers) via HSV classification and blur validation.</div>
+                <div style="margin-top:10px;"><span class="badge badge-neutral" id="overview-status-cv">0/6 Faces Ready</span></div>
+              </div>
+
+              <div class="pipeline-step" id="overview-step-ee">
+                <div class="step-num">Module B</div>
+                <div class="step-title">Entropy Engine</div>
+                <div class="step-desc">Acoustic telemetry (RMS energy, spectral centroid, ZCR) combined into a canonical SHA-256 pre-image.</div>
+                <div style="margin-top:10px;"><span class="badge badge-neutral" id="overview-status-ee">Audio Pending</span></div>
+              </div>
+
+              <div class="pipeline-step" id="overview-step-ac">
+                <div class="step-num">Module C</div>
+                <div class="step-title">Authentication Core</div>
+                <div class="step-desc">Demonstration session token issued via OS CSPRNG (Python secrets) and validated against active TTL.</div>
+                <div style="margin-top:10px;"><span class="badge badge-neutral" id="overview-status-ac">No Active Token</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity & Environment -->
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Recent Session Activity</span>
+                <button class="btn btn-subtle" style="padding:3px 8px; font-size:11px;" id="btnOverviewRefreshLogs">Refresh</button>
+              </div>
+              <div id="overviewRecentLogsList" style="display:flex; flex-direction:column; gap:8px; font-size:12px;">
+                <span style="color:var(--text-muted);">No activity recorded in this session yet.</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Prototype Environment Telemetry</span>
+              </div>
+              <table class="metrics-table">
+                <tbody>
+                  <tr><th>Runtime</th><td>Python 3.13 / Flask</td></tr>
+                  <tr><th>Vision Engine</th><td>OpenCV 5.0.0 (Headless)</td></tr>
+                  <tr><th>Telemetry Model</th><td>NumPy Real-FFT &amp; RMS Energy</td></tr>
+                  <tr><th>Audit Store</th><td>SQLite Local Database</td></tr>
+                  <tr><th>Data Privacy</th><td>100% Localhost (No External Cloud Calls)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 2: MODULE A - CUBE VISION ================= -->
+        <section class="module-view" id="view-cube-vision">
+          <div class="view-header">
+            <div class="view-pretitle">Module A</div>
+            <h1 class="view-title">Cube Vision Acquisition</h1>
+            <p class="view-description">
+              Upload photographs of all six scrambled Rubik's Cube faces. OpenCV analyzes image sharpness, extracts the 3x3 sticker grid, and classifies colors using median HSV color boundaries.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Face Image Acquisition (6 Required)</span>
+              <div class="card-actions">
+                <button class="btn btn-secondary" id="btnLoadAllSampleFaces">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  Load 6 Sample Faces
+                </button>
+                <button class="btn btn-subtle" id="btnClearAllFaces">Clear Faces</button>
+              </div>
+            </div>
+
+            <div class="alert alert-info" id="cubeVisionStatusAlert" style="margin-bottom:16px;">
+              <span>Please upload an image for each of the 6 faces, or click <strong>Load 6 Sample Faces</strong> to test with high-resolution reference images.</span>
+            </div>
+
+            <!-- 6 Cube Faces Cards -->
+            <div class="cube-faces-grid" id="cubeFacesContainer">
+              <!-- U (Up/White) -->
+              <div class="face-card" data-face="U" id="face-card-U">
+                <div class="face-card-header">
+                  <div class="face-label">
+                    <span class="face-center-swatch" style="background-color:#ffffff;"></span>
+                    <span>Face U (Up / Top)</span>
+                  </div>
+                  <span class="badge badge-neutral face-badge">Pending</span>
+                </div>
+                <div class="face-dropzone" onclick="triggerFaceUpload('U')">
+                  <input type="file" id="file-input-U" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleFaceFileSelected('U', this)">
+                  <div class="face-dropzone-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Upload Face U</div>
+                    <div style="font-size:10px; color:var(--text-muted);">PNG, JPG, or WEBP</div>
+                  </div>
+                </div>
+                <div class="face-preview-area" style="display:none;"></div>
+                <div class="face-actions-row" style="margin-top:8px; display:flex; justify-content:space-between;">
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" onclick="loadSingleSampleFace('U')">Use Sample</button>
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" onclick="triggerFaceUpload('U')">Replace</button>
+                </div>
+              </div>
+
+              <!-- D (Down/Yellow) -->
+              <div class="face-card" data-face="D" id="face-card-D">
+                <div class="face-card-header">
+                  <div class="face-label">
+                    <span class="face-center-swatch" style="background-color:#ffd500;"></span>
+                    <span>Face D (Down / Bottom)</span>
+                  </div>
+                  <span class="badge badge-neutral face-badge">Pending</span>
+                </div>
+                <div class="face-dropzone" onclick="triggerFaceUpload('D')">
+                  <input type="file" id="file-input-D" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleFaceFileSelected('D', this)">
+                  <div class="face-dropzone-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Upload Face D</div>
+                    <div style="font-size:10px; color:var(--text-muted);">PNG, JPG, or WEBP</div>
+                  </div>
+                </div>
+                <div class="face-preview-area" style="display:none;"></div>
+                <div class="face-actions-row" style="margin-top:8px; display:flex; justify-content:space-between;">
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" onclick="loadSingleSampleFace('D')">Use Sample</button>
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" onclick="triggerFaceUpload('D')">Replace</button>
+                </div>
+              </div>
+
+              <!-- F (Front/Green) -->
+              <div class="face-card" data-face="F" id="face-card-F">
+                <div class="face-card-header">
+                  <div class="face-label">
+                    <span class="face-center-swatch" style="background-color:#009b48;"></span>
+                    <span>Face F (Front)</span>
+                  </div>
+                  <span class="badge badge-neutral face-badge">Pending</span>
+                </div>
+                <div class="face-dropzone" onclick="triggerFaceUpload('F')">
+                  <input type="file" id="file-input-F" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleFaceFileSelected('F', this)">
+                  <div class="face-dropzone-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Upload Face F</div>
+                    <div style="font-size:10px; color:var(--text-muted);">PNG, JPG, or WEBP</div>
+                  </div>
+                </div>
+                <div class="face-preview-area" style="display:none;"></div>
+                <div class="face-actions-row" style="margin-top:8px; display:flex; justify-content:space-between;">
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" onclick="loadSingleSampleFace('F')">Use Sample</button>
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" onclick="triggerFaceUpload('F')">Replace</button>
+                </div>
+              </div>
+
+              <!-- B (Back/Blue) -->
+              <div class="face-card" data-face="B" id="face-card-B">
+                <div class="face-card-header">
+                  <div class="face-label">
+                    <span class="face-center-swatch" style="background-color:#0046ad;"></span>
+                    <span>Face B (Back)</span>
+                  </div>
+                  <span class="badge badge-neutral face-badge">Pending</span>
+                </div>
+                <div class="face-dropzone" onclick="triggerFaceUpload('B')">
+                  <input type="file" id="file-input-B" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleFaceFileSelected('B', this)">
+                  <div class="face-dropzone-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Upload Face B</div>
+                    <div style="font-size:10px; color:var(--text-muted);">PNG, JPG, or WEBP</div>
+                  </div>
+                </div>
+                <div class="face-preview-area" style="display:none;"></div>
+                <div class="face-actions-row" style="margin-top:8px; display:flex; justify-content:space-between;">
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" onclick="loadSingleSampleFace('B')">Use Sample</button>
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" onclick="triggerFaceUpload('B')">Replace</button>
+                </div>
+              </div>
+
+              <!-- L (Left/Orange) -->
+              <div class="face-card" data-face="L" id="face-card-L">
+                <div class="face-card-header">
+                  <div class="face-label">
+                    <span class="face-center-swatch" style="background-color:#ff5800;"></span>
+                    <span>Face L (Left)</span>
+                  </div>
+                  <span class="badge badge-neutral face-badge">Pending</span>
+                </div>
+                <div class="face-dropzone" onclick="triggerFaceUpload('L')">
+                  <input type="file" id="file-input-L" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleFaceFileSelected('L', this)">
+                  <div class="face-dropzone-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Upload Face L</div>
+                    <div style="font-size:10px; color:var(--text-muted);">PNG, JPG, or WEBP</div>
+                  </div>
+                </div>
+                <div class="face-preview-area" style="display:none;"></div>
+                <div class="face-actions-row" style="margin-top:8px; display:flex; justify-content:space-between;">
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" onclick="loadSingleSampleFace('L')">Use Sample</button>
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" onclick="triggerFaceUpload('L')">Replace</button>
+                </div>
+              </div>
+
+              <!-- R (Right/Red) -->
+              <div class="face-card" data-face="R" id="face-card-R">
+                <div class="face-card-header">
+                  <div class="face-label">
+                    <span class="face-center-swatch" style="background-color:#b71234;"></span>
+                    <span>Face R (Right)</span>
+                  </div>
+                  <span class="badge badge-neutral face-badge">Pending</span>
+                </div>
+                <div class="face-dropzone" onclick="triggerFaceUpload('R')">
+                  <input type="file" id="file-input-R" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleFaceFileSelected('R', this)">
+                  <div class="face-dropzone-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Upload Face R</div>
+                    <div style="font-size:10px; color:var(--text-muted);">PNG, JPG, or WEBP</div>
+                  </div>
+                </div>
+                <div class="face-preview-area" style="display:none;"></div>
+                <div class="face-actions-row" style="margin-top:8px; display:flex; justify-content:space-between;">
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" onclick="loadSingleSampleFace('R')">Use Sample</button>
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" onclick="triggerFaceUpload('R')">Replace</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Validation Bar -->
+            <div style="display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:1px solid var(--border-light);">
+              <div id="cubeValidationSummary">
+                <span style="font-weight:600;">Status: </span>
+                <span id="cubeFacesCountText">0 of 6 faces identified.</span>
+              </div>
+              <button class="btn btn-primary" id="btnContinueToEntropy" disabled>
+                Continue to Entropy Engine &rarr;
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 3: MODULE B - ENTROPY ENGINE ================= -->
+        <section class="module-view" id="view-entropy-engine">
+          <div class="view-header">
+            <div class="view-pretitle">Module B</div>
+            <h1 class="view-title">Entropy Engine &amp; Feature Fusion</h1>
+            <p class="view-description">
+              Process mechanical scrambling audio, extract signal energy and frequency features, and fuse with the detected cube representation into a reproducible SHA-256 digest.
+            </p>
+          </div>
+
+          <div class="alert alert-warning">
+            <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <div>
+              <strong>Cryptographic Distinction:</strong> SHA-256 is a deterministic one-way hash function. It does not generate or amplify entropy. The resulting digest represents a deterministic fingerprint of physical inputs, not a certified private encryption key.
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Audio Acquisition Box -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Scrambling Audio Acquisition</span>
+                <button class="btn btn-secondary" style="font-size:12px;" id="btnLoadSampleAudio">
+                  Load Sample Audio
+                </button>
+              </div>
+
+              <div class="audio-recorder-box">
+                <div class="recorder-controls">
+                  <button class="btn btn-primary" id="btnRecordToggle">
+                    <span id="recordIconDot" class="indicator-dot dot-idle"></span>
+                    <span id="recordBtnText">Record Live Scramble (3s)</span>
+                  </button>
+                  <span style="color:var(--text-muted); font-size:12px;">or</span>
+                  <label class="btn btn-secondary" style="margin:0; cursor:pointer;">
+                    Upload WAV
+                    <input type="file" id="audioFileInput" accept="audio/wav,audio/webm,audio/ogg" style="display:none;" onchange="handleAudioUpload(this)">
+                  </label>
+                  <span id="audioProcessingSpinner" style="display:none; font-size:12px; color:var(--brand-primary);">Analyzing...</span>
+                </div>
+
+                <div id="audioPlayerWrapper" style="display:none;">
+                  <audio id="audioPlayback" controls style="width:100%; height:36px;"></audio>
+                </div>
+
+                <div>
+                  <div style="font-size:11px; font-weight:600; color:var(--text-muted); margin-bottom:4px;">Waveform &amp; Signal Energy</div>
+                  <canvas id="waveformCanvas" class="waveform-canvas" width="500" height="90"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Audio Acoustic Telemetry -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Extracted Acoustic Characteristics</span>
+                <span class="badge badge-neutral" id="audioAnalysisBadge">Pending Input</span>
+              </div>
+
+              <table class="metrics-table">
+                <tbody>
+                  <tr><th>Signal Duration</th><td id="m-audio-duration">—</td></tr>
+                  <tr><th>Sample Rate</th><td id="m-audio-sr">—</td></tr>
+                  <tr><th>RMS Signal Energy</th><td id="m-audio-rms">—</td></tr>
+                  <tr><th>Peak Amplitude</th><td id="m-audio-peak">—</td></tr>
+                  <tr><th>Zero-Crossing Rate (ZCR)</th><td id="m-audio-zcr">—</td></tr>
+                  <tr><th>Spectral Centroid (Hz)</th><td id="m-audio-centroid">—</td></tr>
+                  <tr><th>Spectral Roll-off (85%)</th><td id="m-audio-rolloff">—</td></tr>
+                  <tr><th>Dominant Frequencies</th><td id="m-audio-peaks">—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Feature Fusion & Canonical Pre-image -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Feature Fusion &amp; Canonical Digest Generation</span>
+              <button class="btn btn-primary" id="btnComputeDigest">
+                Compute SHA-256 Digest
+              </button>
+            </div>
+
+            <div id="digestValidationAlert" class="alert alert-info">
+              <span>Verify that all 6 cube faces and scramble audio are ready before generating the canonical digest.</span>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Canonical Physical Pre-image Representation (Deterministic UTF-8 Payload)</label>
+              <textarea id="canonicalPreimageView" class="code-editor" style="height:110px;" readonly placeholder="Pre-image representation will appear once computed..."></textarea>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">SHA-256 Digest Output (Hexadecimal Fingerprint)</label>
+              <div class="digest-display-box" id="digestOutputBox">
+                e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (Awaiting Computation)
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px;">
+              <button class="btn btn-secondary" id="btnCopyDigest" disabled>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Copy Digest Hex
+              </button>
+              <button class="btn btn-primary" id="btnContinueToAuth" disabled>
+                Proceed to Authentication Core &rarr;
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 4: MODULE C - AUTHENTICATION CORE ================= -->
+        <section class="module-view" id="view-authentication">
+          <div class="view-header">
+            <div class="view-pretitle">Module C</div>
+            <h1 class="view-title">Authentication Core</h1>
+            <p class="view-description">
+              Demonstrate how CubeSec session context binds to secure token issuance. Demo session tokens are generated via Python's secure randomness facilities (CSPRNG) with active TTL verification.
+            </p>
+          </div>
+
+          <div class="alert alert-info">
+            <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <div>
+              <strong>Production Scope Notice:</strong> Secure authentication tokens in this prototype are generated via Python's <code>secrets.token_urlsafe</code> module. The cube digest acts as physical context binding, not as the sole secret key.
+            </div>
+          </div>
+
+          <div class="auth-panel">
+            <!-- Left: Token Issuance -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Token Issuance (Authentication Authority)</span>
+                <span class="badge badge-neutral" id="tokenStatusBadge">No Token Issued</span>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Linked Physical Digest Reference</label>
+                <input type="text" id="authDigestRef" class="input-text" readonly placeholder="Waiting for Entropy Engine digest...">
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Session Token TTL (Lifetime)</label>
+                <select id="authTtlSelect" class="input-text">
+                  <option value="60">60 Seconds (Fast Expiry Test)</option>
+                  <option value="180" selected>180 Seconds (Default 3 Min)</option>
+                  <option value="600">600 Seconds (10 Min)</option>
+                </select>
+              </div>
+
+              <button class="btn btn-primary" id="btnIssueToken" style="width:100%; margin-top:6px;">
+                Generate Cryptographically Random Demo Token
+              </button>
+
+              <div style="margin-top:16px;">
+                <label class="input-label">Active Demo Token</label>
+                <div class="token-badge-large" id="issuedTokenDisplay">None</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                  <span style="font-size:12px; color:var(--text-secondary);" id="tokenExpiryCountdown">TTL Countdown: Idle</span>
+                  <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" id="btnCopyIssuedToken" disabled>Copy Token</button>
+                </div>
+              </div>
+
+              <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border-light); font-size:11px; color:var(--text-muted);">
+                <strong>Entropy Source:</strong> <code>secrets.token_urlsafe(32)</code> — 256 bits of OS cryptographically secure pseudorandomness.
+              </div>
+            </div>
+
+            <!-- Right: Token Verification -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Token Verification (Security Gateway)</span>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Submit Token for Verification</label>
+                <input type="text" id="verifyTokenInput" class="input-text" placeholder="Enter or paste token to verify...">
+              </div>
+
+              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
+                <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" id="btnPresetActive">Paste Active</button>
+                <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" id="btnPresetTampered">Tamper Token</button>
+                <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" id="btnPresetInvalid">Invalid Prefix</button>
+                <button class="btn btn-subtle" style="font-size:11px; padding:3px 8px;" id="btnPresetClear">Clear</button>
+              </div>
+
+              <button class="btn btn-primary" id="btnVerifyToken" style="width:100%;">
+                Verify Token Authenticity
+              </button>
+
+              <!-- Verification Outcome Alert -->
+              <div id="verifyOutcomeBox" style="margin-top:16px; display:none;" class="alert">
+                <div id="verifyOutcomeText"></div>
+              </div>
+
+              <table class="metrics-table" id="verifyDetailsTable" style="margin-top:14px; display:none;">
+                <tbody>
+                  <tr><th>Remaining TTL</th><td id="m-verify-ttl">—</td></tr>
+                  <tr><th>Issued At</th><td id="m-verify-issued">—</td></tr>
+                  <tr><th>Expires At</th><td id="m-verify-expires">—</td></tr>
+                  <tr><th>Bound Digest</th><td id="m-verify-digest">—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 5: API PLAYGROUND ================= -->
+        <section class="module-view" id="view-api-playground">
+          <div class="view-header">
+            <div class="view-pretitle">Developer Tools</div>
+            <h1 class="view-title">API Playground</h1>
+            <p class="view-description">
+              Test CubeSec backend endpoints interactively with real HTTP requests and inspect the returned JSON schemas.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span class="badge badge-success" id="playgroundMethodBadge">POST</span>
+                <select id="playgroundEndpointSelect" class="input-text" style="font-weight:600;">
+                  <option value="/api/cube/analyze">POST /api/cube/analyze</option>
+                  <option value="/api/cube/load-all-samples">POST /api/cube/load-all-samples</option>
+                  <option value="/api/audio/analyze">POST /api/audio/analyze</option>
+                  <option value="/api/entropy/process">POST /api/entropy/process</option>
+                  <option value="/api/auth/token">POST /api/auth/token</option>
+                  <option value="/api/auth/verify">POST /api/auth/verify</option>
+                  <option value="/api/session/status">GET /api/session/status</option>
+                  <option value="/api/logs">GET /api/logs</option>
+                </select>
+              </div>
+
+              <div class="card-actions">
+                <button class="btn btn-subtle" id="btnCopyCurl" title="Copy as cURL command">Copy cURL</button>
+                <button class="btn btn-primary" id="btnPlaygroundSend">
+                  Send Request &rarr;
+                </button>
+              </div>
+            </div>
+
+            <div class="playground-layout">
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                  <span class="input-label">Request Body (JSON)</span>
+                  <span style="font-size:11px; color:var(--text-muted);">Editable</span>
+                </div>
+                <textarea id="playgroundRequestBody" class="code-editor"></textarea>
+              </div>
+
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px; align-items:center;">
+                  <span class="input-label">HTTP Response</span>
+                  <div style="display:flex; gap:8px; align-items:center;">
+                    <span id="playgroundStatusBadge" class="badge badge-neutral">—</span>
+                    <span id="playgroundLatencyBadge" style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">0 ms</span>
+                  </div>
+                </div>
+                <pre id="playgroundResponseBody" class="code-output">Click "Send Request" to execute...</pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 6: SECURITY LOGS ================= -->
+        <section class="module-view" id="view-security-logs">
+          <div class="view-header">
+            <div class="view-pretitle">Audit &amp; Compliance</div>
+            <h1 class="view-title">Security &amp; Activity Logs</h1>
+            <p class="view-description">
+              Real-time persistent audit records backed by SQLite. Tracks CV detections, acoustic extractions, SHA-256 computations, token issuances, and authentication attempts.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <select id="logFilterEvent" class="input-text" style="font-size:12px; padding:4px 8px;">
+                  <option value="">All Event Types</option>
+                  <option value="CV_ANALYSIS">CV_ANALYSIS</option>
+                  <option value="AUDIO_EXTRACTION">AUDIO_EXTRACTION</option>
+                  <option value="ENTROPY_PIPELINE">ENTROPY_PIPELINE</option>
+                  <option value="TOKEN_ISSUED">TOKEN_ISSUED</option>
+                  <option value="AUTH_VERIFY_SUCCESS">AUTH_VERIFY_SUCCESS</option>
+                  <option value="AUTH_VERIFY_FAILURE">AUTH_VERIFY_FAILURE</option>
+                  <option value="SESSION_RESET">SESSION_RESET</option>
+                </select>
+
+                <select id="logFilterStatus" class="input-text" style="font-size:12px; padding:4px 8px;">
+                  <option value="">All Statuses</option>
+                  <option value="SUCCESS">SUCCESS</option>
+                  <option value="WARNING">WARNING</option>
+                  <option value="FAILED">FAILED</option>
+                </select>
+              </div>
+
+              <div class="card-actions">
+                <button class="btn btn-secondary" id="btnRefreshLogs">Refresh</button>
+                <button class="btn btn-danger-outline" id="btnClearLogs">Clear Logs</button>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table" id="securityLogsTable">
+                <thead>
+                  <tr>
+                    <th>Timestamp (UTC)</th>
+                    <th>Event Type</th>
+                    <th>Module</th>
+                    <th>Status</th>
+                    <th>Client IP</th>
+                    <th>Summary</th>
+                  </tr>
+                </thead>
+                <tbody id="securityLogsTableBody">
+                  <tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Loading audit logs...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Floating CubeSec Assistant Chatbot -->
+  <button class="chatbot-launcher" id="chatbotLauncher" aria-label="Open CubeSec Assistant" title="Open CubeSec Assistant">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+  </button>
+
+  <aside class="chatbot-drawer" id="chatbotDrawer" aria-label="CubeSec Assistant Chat">
+    <div class="chat-header">
+      <div class="chat-title-group">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+        <span class="chat-bot-name">CubeSec Assistant</span>
+      </div>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <button class="btn btn-subtle" style="padding:2px 6px; font-size:10px;" id="btnResetChat">Clear</button>
+        <button class="btn-icon" id="btnCloseChat" aria-label="Close Chat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <!-- Injected by chatbot.js -->
+    </div>
+
+    <div class="chat-quick-replies" id="chatQuickReplies">
+      <button class="chip-btn" data-reply="What is CubeSec?">What is CubeSec?</button>
+      <button class="chip-btn" data-reply="How does it work?">How does it work?</button>
+      <button class="chip-btn" data-reply="Explain the modules">Explain the modules</button>
+      <button class="chip-btn" data-reply="How do I test authentication?">Test authentication</button>
+      <button class="chip-btn" data-reply="Is this production ready?">Production ready?</button>
+    </div>
+
+    <form class="chat-input-area" id="chatInputForm">
+      <input type="text" id="chatInputField" class="chat-input" placeholder="Ask CubeSec Assistant..." autocomplete="off">
+      <button type="submit" class="btn btn-primary" style="padding:6px 10px;">Send</button>
+    </form>
+  </aside>
+
+  <!-- Legal / Privacy Modal -->
+  <div class="modal-overlay" id="legalModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border-light); padding-bottom:8px;">
+        <h2 id="modalTitle" style="font-size:16px; font-weight:600;">Privacy &amp; Prototype Legal Notice</h2>
+        <button class="btn-icon" id="btnCloseLegalModal">&times;</button>
+      </div>
+      <div id="modalBodyText" style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/cube_vision.js"></script>
+  <script src="/static/js/entropy_engine.js"></script>
+  <script src="/static/js/auth_core.js"></script>
+  <script src="/static/js/api_playground.js"></script>
+  <script src="/static/js/security_logs.js"></script>
+  <script src="/static/js/chatbot.js"></script>
+</body>
+</html>
