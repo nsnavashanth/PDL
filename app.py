@@ -389,6 +389,14 @@ def get_sample_audio_file():
         return send_file(path, mimetype='audio/wav')
     return jsonify({'error': 'Sample audio missing'}), 404
 
+@app.route('/api/download/report.pdf', methods=['GET'])
+def download_pdf_report():
+    pdf_path = os.path.join(os.path.dirname(__file__), "CubeSec_Technical_Report.pdf")
+    if not os.path.exists(pdf_path):
+        import generate_pdf_report
+        generate_pdf_report.build_pdf()
+    return send_file(pdf_path, as_attachment=True, download_name="CubeSec_Technical_Report.pdf", mimetype='application/pdf')
+
 # Error handlers
 @app.errorhandler(404)
 def not_found(e):

@@ -73,6 +73,14 @@
             <span>Security Logs</span>
           </div>
         </button>
+
+        <button class="nav-item" data-view="tech-report" id="nav-tech-report">
+          <div class="nav-item-content">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <span>Technical Report</span>
+          </div>
+          <span class="nav-badge" style="background-color:var(--brand-primary); color:#fff;">PDF</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -733,6 +741,114 @@
                 </tbody>
               </table>
             </div>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 7: TECHNICAL REPORT & ARCHITECTURE ================= -->
+        <section class="module-view" id="view-tech-report">
+          <div class="view-header">
+            <div class="view-pretitle">Full Technical Documentation</div>
+            <h1 class="view-title">System Architecture &amp; Technical Report</h1>
+            <p class="view-description">
+              Comprehensive report detailing functions, use cases, algorithmic methodologies, website technology stack, threat model, and cryptographic qualifications.
+            </p>
+          </div>
+
+          <!-- Download Action Bar -->
+          <div class="card" style="background:var(--brand-subtle); border-color:var(--brand-border);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div>
+                <strong style="color:var(--brand-primary); font-size:14px;">CubeSec Technical Report (PDF Edition)</strong>
+                <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                  Complete 6-section whitepaper format with system flowcharts, DSP equations, technology matrices, and threat models.
+                </div>
+              </div>
+              <a href="/api/download/report.pdf" class="btn btn-primary" target="_blank" download="CubeSec_Technical_Report.pdf">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download PDF Report
+              </a>
+            </div>
+          </div>
+
+          <!-- Report Body Cards -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">1. Executive Summary &amp; Functional Scope</span>
+            </div>
+            <p style="font-size:13px; line-height:1.6; color:var(--text-secondary); margin-bottom:12px;">
+              Digital authentication traditionally relies on pre-shared static passwords, biometric measurements, or software-based pseudorandom generators. <strong>CubeSec</strong> introduces an experimental hybrid model: physically acquiring multi-modal sensor inputs from a chaotic physical artifact—a scrambled Rubik's Cube (optical configuration across 54 color stickers) and the acoustic transients of its rotational turns—to construct a reproducible physical context-binding pipeline.
+            </p>
+            <div class="alert alert-warning" style="margin-bottom:0;">
+              <strong>Cryptographic Integrity Statement:</strong> CubeSec is an exploratory prototype for hackathon evaluation and security research. The physical cube state and scramble audio provide demonstrative physical inputs and have not undergone NIST SP 800-90B entropy validation. SHA-256 produces a deterministic collision-resistant digest; it does not amplify or create entropy. Security-critical demo tokens are issued via the operating system's CSPRNG (<code>Python secrets.token_urlsafe</code>).
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">2. Processing Pipeline &amp; Data Flow</span>
+            </div>
+            <pre class="code-output" style="height:auto; font-size:11px; margin-bottom:14px;">
+[Physical Scrambled Cube] ---> Module A: Cube Vision (OpenCV 5.0)
+                              - Laplacian Sharpness Validation (Var &gt;= 15.0)
+                              - 3x3 Region of Interest (ROI) Sticker Grid
+                              - HSV Color Space Classification (54 Stickers)
+                                      |
+[Scramble Audio Clicks]   ---> Module B: Entropy Engine (NumPy DSP)
+                              - RMS Signal Energy &amp; Peak Amplitude
+                              - Zero-Crossing Rate (ZCR) &amp; FFT Spectral Centroid
+                              - Canonical Pre-image UTF-8 JSON Serialization
+                              - Deterministic SHA-256 Digest (256-bit Hex)
+                                      |
+                                      v
+                               Module C: Authentication Core
+                              - 256-bit OS CSPRNG Demo Token (Python secrets)
+                              - Active TTL Countdown (60s / 180s / 600s)
+                              - Gateway Verification: Valid, Expired, Tampered
+                                      |
+                                      v
+                        [Audit &amp; Developer Infrastructure]
+                         - API Playground (Interactive REST tester)
+                         - Security Logs (Embedded SQLite Audit Trail)
+                         - CubeSec Assistant (Client-Side Guidance Bot)
+            </pre>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">3. Technology Stack &amp; Architectural Rationale</span>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr><th>Component</th><th>Technology</th><th>Architectural Rationale</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Frontend Core</strong></td><td>HTML5, Vanilla JavaScript (ES6+)</td><td>Zero build overhead; instant startup in any laptop browser.</td></tr>
+                <tr><td><strong>Design System</strong></td><td>Vanilla CSS Variables</td><td>Product-focused Apple aesthetic, full light and charcoal dark themes.</td></tr>
+                <tr><td><strong>Backend Server</strong></td><td>Python 3.13 + Flask 3.1</td><td>Lightweight microframework providing REST API endpoints and static serving.</td></tr>
+                <tr><td><strong>Computer Vision</strong></td><td>OpenCV 5.0.0 (Headless)</td><td>Laplacian sharpness checks, HSV color space extraction, visual overlays.</td></tr>
+                <tr><td><strong>Acoustic DSP</strong></td><td>NumPy 2.5 + wave</td><td>Real-FFT, RMS energy, and ZCR calculations without external FFmpeg.</td></tr>
+                <tr><td><strong>Cryptographic Engine</strong></td><td>hashlib &amp; secrets</td><td>SHA-256 canonical hashing and 256-bit OS CSPRNG token generation.</td></tr>
+                <tr><td><strong>Audit Store</strong></td><td>SQLite 3 (cubesec.db)</td><td>Embedded, ACID-compliant audit logging and token verification store.</td></tr>
+                <tr><td><strong>Privacy</strong></td><td>100% Localhost Execution</td><td>Zero cloud transmission; temporary in-memory data processing.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">4. Threat Model &amp; Prototype Mitigations</span>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr><th>Threat Vector</th><th>Vulnerability Analysis</th><th>CubeSec Mitigation Strategy</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Predictable Physical Input</strong></td><td>Cube faces can be observed or photographed.</td><td>Physical digest is physical context binding, NEVER a private key.</td></tr>
+                <tr><td><strong>Acoustic Replay Attack</strong></td><td>Adversary replays a recorded scramble sound.</td><td>Multi-modal fusion binds 54 sticker states, acoustic telemetry, and an ephemeral salt.</td></tr>
+                <tr><td><strong>Image Fabrication</strong></td><td>Submitting dark or blank images to exploit classification.</td><td>Strict Laplacian variance (&gt;= 15.0) and brightness thresholds enforce honest rejection.</td></tr>
+                <tr><td><strong>Token Hijacking</strong></td><td>Valid demo token intercepted in transit.</td><td>Strict configurable TTL expiration (60–180s) automatically purges token validity.</td></tr>
+              </tbody>
+            </table>
           </div>
         </section>
 

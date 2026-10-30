@@ -140,7 +140,8 @@ const App = {
       'entropy-engine': 'Entropy Engine (Module B)',
       'authentication': 'Authentication (Module C)',
       'api-playground': 'API Playground',
-      'security-logs': 'Security Logs'
+      'security-logs': 'Security Logs',
+      'tech-report': 'Technical Report'
     };
     if (breadcrumb) {
       breadcrumb.textContent = titles[viewId] || viewId;

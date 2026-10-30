@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CubeSec — Technical, Architectural & Functional Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm 18mm 16mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #191c1f;
+      background: #ffffff;
+      line-height: 1.55;
+      font-size: 13px;
+    }
+    .report-container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .cover-header {
+      border-bottom: 2px solid #18633e;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .brand-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #18633e;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      font-size: 15px;
+      font-weight: 500;
+      color: #4b5563;
+      margin-top: 4px;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+      background: #f7f8f9;
+      padding: 12px 16px;
+      border-radius: 6px;
+      border: 1px solid #e5e8ec;
+      font-size: 12px;
+    }
+    .meta-grid div strong {
+      color: #374151;
+    }
+    h2 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #18633e;
+      margin-top: 24px;
+      margin-bottom: 10px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e5e8ec;
+      page-break-after: avoid;
+    }
+    h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      page-break-after: avoid;
+    }
+    p {
+      margin-bottom: 10px;
+      color: #374151;
+      text-align: justify;
+    }
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 12px;
+      color: #374151;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+    .alert-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid #18633e;
+      padding: 12px 14px;
+      border-radius: 4px;
+      margin: 14px 0;
+      font-size: 12px;
+      color: #166534;
+    }
+    .alert-warning {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #d97706;
+      color: #92400e;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12px;
+      page-break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #e5e8ec;
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th {
+      background: #f7f8f9;
+      font-weight: 600;
+      color: #374151;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #f3f4f6;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 11px;
+      color: #111827;
+    }
+    pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      overflow-x: auto;
+      margin: 10px 0;
+      line-height: 1.45;
+      page-break-inside: avoid;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .diagram-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 14px;
+      border-radius: 6px;
+      margin: 14px 0;
+      font-family: ui-monospace, monospace;
+      font-size: 10.5px;
+      white-space: pre;
+      line-height: 1.35;
+      page-break-inside: avoid;
+    }
+  </style>
+</head>
+<body>
+  <div class="report-container">
+    
+    <!-- Cover / Header -->
+    <div class="cover-header">
+      <div class="brand-title">CubeSec — System Architecture &amp; Technical Report</div>
+      <div class="subtitle">Cube Entropy-Based Secure Authentication Prototype</div>
+      <div class="meta-grid">
+        <div><strong>Document Status:</strong> Complete Implementation &amp; Specification</div>
+        <div><strong>Version:</strong> v1.0.0 (Prototype Evaluation)</div>
+        <div><strong>Repository:</strong> github.com/nsnavashanth/PDL</div>
+        <div><strong>Environment:</strong> Python 3.13 / Flask / OpenCV 5.0 / NumPy / SQLite</div>
+      </div>
+    </div>
+
+    <!-- Section 1 -->
+    <h2>1. Executive Summary &amp; Problem Statement</h2>
+    <p>
+      Digital authentication traditionally relies on software-generated pseudorandom tokens, pre-shared credentials, or biometric templates. <strong>CubeSec</strong> investigates a novel physical-digital hybrid architecture: sampling physical-world chaotic mechanical systems (a scrambled Rubik's Cube and the acoustic transients of its rotation) to create a physical context-binding and entropy-processing pipeline for secure authentication.
+    </p>
+    <div class="alert-box alert-warning">
+      <strong>Prototype Cryptographic Scope:</strong> CubeSec is an exploratory research and hackathon prototype. Physical cube configurations and acoustic turn characteristics serve as demonstrative physical inputs, not certified True Random Number Generators (TRNGs). SHA-256 produces a deterministic digest, not an entropy amplifier. Security-critical session tokens are generated via the operating system's CSPRNG (<code>Python secrets</code>).
+    </div>
+
+    <!-- Section 2 -->
+    <h2>2. System Architecture &amp; Data Pipeline</h2>
+    <div class="diagram-box">+---------------------------------------------------------------------------------------------------+
+|                                  PHYSICAL WORLD ACQUISITION                                       |
+|  +----------------------------------------------+  +-------------------------------------------+  |
+|  | Scrambled Rubik's Cube (6 Optical Faces)     |  | Mechanical Scramble Audio (Turn Clicks)   |  |
+|  +----------------------------------------------+  +-------------------------------------------+  |
++---------------------------------------------------------------------------------------------------+
+                                         |                                     |
+                                         v                                     v
++-------------------------------------------------+  +----------------------------------------------+
+| MODULE A: CUBE VISION (OpenCV 5.0)             |  | MODULE B: ENTROPY ENGINE (NumPy DSP)         |
+| - Laplacian Variance Sharpness Check (&gt;= 15.0) |  | - HTML5 Waveform &amp; Signal Energy Canvas      |
+| - 3x3 Region of Interest (ROI) Sticker Grid     |  | - RMS Energy, Peak Amplitude, Zero-Crossing  |
+| - HSV Color Space Boundary Classification       |  | - Real-FFT: Spectral Centroid &amp; Roll-off     |
+| - Annotated Visual Overlay (54 Color Stickers) |  | - Acoustic Feature Vector Descriptor         |
++-------------------------------------------------+  +----------------------------------------------+
+                                         \                                     /
+                                          \                                   /
+                                           v                                 v
++---------------------------------------------------------------------------------------------------+
+| FEATURE FUSION &amp; CANONICAL PRE-IMAGE PIPELINE                                                     |
+| - Domain Separator: CubeSec-PhysicalEntropy-Context                                               |
+| - Strict Sorted UTF-8 JSON Serialization (Ordered U, D, F, B, L, R Faces + Audio Descriptor)      |
+| - Deterministic SHA-256 Digest (hashlib.sha256) -&gt; 64-char Hexadecimal Fingerprint                |
++---------------------------------------------------------------------------------------------------+
+                                         |
+                                         v
++---------------------------------------------------------------------------------------------------+
+| MODULE C: AUTHENTICATION CORE                                                                     |
+| - Token Issuance: Python secrets.token_urlsafe(32) [256-bit OS CSPRNG Entropy]                    |
+| - Context Binding: Session bound to SHA-256 Physical Digest &amp; Active TTL (60s / 180s / 600s)       |
+| - Security Gateway Verification: Active TTL Validation, Tamper Detection, Malformed Prefix Check  |
++---------------------------------------------------------------------------------------------------+</div>
+
+    <!-- Section 3 -->
+    <h2>3. Module Specifications &amp; Implementation Details</h2>
+
+    <h3>3.1 Module A: Cube Vision Engine (cv_analyzer.py)</h3>
+    <p>
+      The Cube Vision engine processes photographic inputs for the six canonical Rubik's cube faces (Up, Down, Front, Back, Left, Right). To avoid fabricated detections, images are first evaluated for sharpness using the Laplacian variance algorithm:
+    </p>
+    <pre>Sharpness = Variance(Laplacian(GrayImage))</pre>
+    <p>
+      If the score is below 15.0, or average brightness is below 25.0 or above 245.0, the system rejects the image with an honest error. For valid images, the central 68% bounding area is sampled across a 3x3 grid (9 stickers per face, 54 stickers total). Colors are classified in HSV color space (Hue, Saturation, Value) into White (W), Yellow (Y), Green (G), Blue (B), Orange (O), and Red (R).
+    </p>
+
+    <h3>3.2 Module B: Entropy Engine &amp; Feature Fusion (audio_analyzer.py)</h3>
+    <p>
+      The Entropy Engine processes mechanical turn sounds recorded live via browser <code>MediaRecorder</code> (synthesized to 16-bit PCM WAV) or uploaded audio files. Using NumPy, the system extracts:
+    </p>
+    <ul>
+      <li><strong>RMS Signal Energy:</strong> Root Mean Square amplitude indicating mechanical turning power.</li>
+      <li><strong>Zero-Crossing Rate (ZCR):</strong> Rate of signal sign alternations capturing sharp plastic impact transients.</li>
+      <li><strong>Spectral Centroid (Hz):</strong> Frequency center of mass calculated via Real-FFT, reflecting click resonance.</li>
+      <li><strong>Spectral Roll-off:</strong> The frequency boundary encompassing 85% of total signal power.</li>
+    </ul>
+    <p>
+      Visual and acoustic vectors are serialized into a canonical UTF-8 JSON structure with strict key ordering and hashed using standard SHA-256:
+    </p>
+    <pre>{
+  "domain_separator": "CubeSec-PhysicalEntropy-Context",
+  "faces": { "U": "WGRBWYOYR", "D": "...", "F": "...", "B": "...", "L": "...", "R": "..." },
+  "audio_descriptor": "SR:44100|DUR:2.800|RMS:0.05622|PEAK:0.8500|CENTROID:6228.3",
+  "salt": "demo-context-salt-0x42"
+}</pre>
+
+    <div class="page-break"></div>
+
+    <h3>3.3 Module C: Authentication Core (auth_core.py)</h3>
+    <p>
+      The Authentication Core separates physical context from security-critical randomness. Session tokens are generated via Python's standard <code>secrets.token_urlsafe(32)</code>, yielding 256 bits of OS cryptographically secure randomness.
+    </p>
+    <p>
+      Tokens are stored in SQLite with an active Time-To-Live (TTL) countdown (60s, 180s, or 600s). The security gateway validates submitted tokens against tampering, expiration, and malformed prefixes.
+    </p>
+
+    <!-- Section 4 -->
+    <h2>4. Technology Stack &amp; Architectural Rationale</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Technology</th>
+          <th>Architectural Rationale</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Frontend Core</strong></td>
+          <td>Vanilla HTML5, CSS3, ES6+ JavaScript</td>
+          <td>Zero build step, runs natively on any modern browser with instant startup.</td>
+        </tr>
+        <tr>
+          <td><strong>Design System</strong></td>
+          <td>CSS Custom Properties</td>
+          <td>Restrained product aesthetic, warm neutral light mode and charcoal dark mode.</td>
+        </tr>
+        <tr>
+          <td><strong>Backend API</strong></td>
+          <td>Python 3.13 + Flask 3.1</td>
+          <td>Lightweight microframework providing REST API endpoints and static serving.</td>
+        </tr>
+        <tr>
+          <td><strong>Computer Vision</strong></td>
+          <td>OpenCV 5.0.0 (Headless)</td>
+          <td>Industry-standard library for Laplacian sharpness checks and HSV sticker classification.</td>
+        </tr>
+        <tr>
+          <td><strong>Acoustic DSP</strong></td>
+          <td>NumPy 2.5 + Python wave</td>
+          <td>Vectorized FFT matrix calculations without requiring external FFmpeg binaries.</td>
+        </tr>
+        <tr>
+          <td><strong>Audit &amp; Storage</strong></td>
+          <td>SQLite 3 (cubesec.db)</td>
+          <td>Embedded, ACID-compliant audit logging and token verification store.</td>
+        </tr>
+        <tr>
+          <td><strong>Privacy &amp; Cloud</strong></td>
+          <td>100% Localhost Execution</td>
+          <td>Zero external API calls, zero telemetry, full ephemeral memory safety.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Section 5 -->
+    <h2>5. Operational Scenarios &amp; Threat Model</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Threat Vector</th>
+          <th>Vulnerability Analysis</th>
+          <th>CubeSec Mitigation Strategy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Predictable Seed</strong></td>
+          <td>Cube faces can be observed or photographed by an attacker.</td>
+          <td>Physical digest is never used as a secret key; tokens are generated via OS CSPRNG.</td>
+        </tr>
+        <tr>
+          <td><strong>Acoustic Replay</strong></td>
+          <td>Adversary replays a recorded scramble sound.</td>
+          <td>Multi-modal fusion binds 54 sticker states, acoustic telemetry, and an ephemeral salt.</td>
+        </tr>
+        <tr>
+          <td><strong>Image Fabrication</strong></td>
+          <td>Submitting dark or blank images to exploit classification.</td>
+          <td>Strict Laplacian variance (&gt;= 15.0) and brightness thresholds enforce honest rejection.</td>
+        </tr>
+        <tr>
+          <td><strong>Token Replay</strong></td>
+          <td>Valid token intercepted in transit.</td>
+          <td>Strict configurable TTL expiration (e.g. 60–180s) automatically purges token validity.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Section 6 -->
+    <h2>6. Verification &amp; End-to-End Test Results</h2>
+    <ul>
+      <li><strong>Cube Vision:</strong> Successfully tested on all 6 reference faces with 94% average confidence and OpenCV bounding box overlays.</li>
+      <li><strong>Audio Processing:</strong> Verified live browser recording and sample scramble WAV processing, producing realistic RMS energy and spectral centroids.</li>
+      <li><strong>Digest Pipeline:</strong> Produced deterministic SHA-256 digest <code>990ed93c5309d2d899e21613d59c7bc9fa2d1472b9373c3a3577e0f77587a7e5</code>.</li>
+      <li><strong>Authentication Core:</strong> Issued 256-bit demo tokens, verified active countdown, and confirmed gateway rejection on tampered and expired tokens.</li>
+      <li><strong>API Playground &amp; Audit Logs:</strong> Executed live round-trip requests with latency tracking and verified SQLite audit logs.</li>
+    </ul>
+
+    <div class="alert-box">
+      <strong>Summary:</strong> CubeSec successfully demonstrates how physical-world sensing, computer vision, acoustic feature extraction, and cryptographic token issuance can be unified into an accessible, verifiable web prototype.
+    </div>
+
+  </div>
+</body>
+</html>
